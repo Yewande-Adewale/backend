@@ -1,8 +1,8 @@
-const fs=require("fs");
-fs.readFile('./sample.txt','utf8', (error,data)=>{
-        if(error){
-            console.log(error)
-        }else{
-            console.log(data);
-        }
-    });
+const fs=require('fs').promises;
+fs.readFile("./sample.txt", "utf8")
+.then(()=>{
+    console.log(data)
+})
+.catch((error)=>{
+    console.log(error);
+ }); 
