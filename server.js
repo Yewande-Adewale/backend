@@ -2,104 +2,108 @@ const express = require('express' )
 const PORT = 7000;
 
 const app = express();
-app.use( express.json())
+app.use( express.json() )
 
-    const employmentSystem= [
-            {
-                id: 1,
-                staffName: "Grace",
-                staffAge: 27,
-                staffSalary: 4000,
-                staffPosition: "supervisor",
-                staffQualification: "Bsc",
-                staffGender: "female"
-            },
-            {
-                id: 2,
-                staffName: "Peter",
-                staffAge: 30,
-                staffSalary: 3000,
-                staffPosition: "instructor",
-                staffQualification: "Hnd",
-                staffGender: "male"
-            },
-    ]
+const contactBook = [
+    {
+        id: 1,
+        Name: "Ubani",
+        Category: "work",
+        Number: 08060,
+        emailAddress: "farad@gmail.com",
+        nickName: "senior dev",
+        Location: "Festac"
 
-    app.get( '/', (req, res) => {
-        res.status( 200 ).json( {
-            message: "Welcome to the Employment System"
-        })
-    } );
+    },
+
+   {  
+       id: 2,
+       Name: "Daniel",
+    Category: "School",
+    Number: 08070,
+    emailAddress: "dan@gmail.com",
+    nickName: "Dan",
+    Location: "Festac"
+   }
+]
+
+//welcome
+app.get('/', (req, res) => {
+    res.status( 200 ).json( {
+        message: "Welcome new contacts"
+    })
+});
+
+//showing all saved contacts 
+app.get('/contactRecords', (req, res) => {
+        res.status( 200 ).json({
+             data: contactBook
+         })
+     } );
+
     
-    app.get( '/employmentRecords', (req, res) => {
-        res.status( 200 ).json( {
-            data: employmentSystem
+    //one contact
+app.get( '/contactRecords/:id', ( req, res ) => {
+    const contactId = parseInt( req.params.id );
+    const contact= contactBook.find( ( item ) => ( item.id === contactId ) );
+    if ( !contact) {
+        res.status( 404 ).json( {
+            data: "task not found."
+    
         })
-    } );
-    app.get( '/employmentRecords/:id', ( req, res ) => {
-        const staffId = parseInt( req.params.id );
-        const staff = employmentSystem.find( ( item ) => ( item.id === staffId ) );
-        if ( !staff ) {
-            res.status( 404 ).json( {
-                data: "user not found."
+    } else {
+        res.status( 200 ).json({
+            data: contact
+        })
+    }
+    })
+
+    app.post('/contactRecords', (req,res) =>{
+        const newContact = req.body;
+         newContact.id = contactBook.length +1;
+         contactBook.push(newContact);
+         res.status( 200 ).json({
+             data: newContact
+            });
         
+         })
+
+   //
+    app.patch('/contactRecords/:id', function(req,res){
+        const contactId = parseInt(req.params.id);
+        const updatedContact = req.body;
+        const index = contactBook.findIndex((item) => (item.id === contactId))
+        if(index !== -1){
+            contactBook[index] ={ ...contactBook[index], ...updatedContact}
+            res.status(200).json({
+                new: contactBook[index]
             })
-        } else {
-            res.status( 200 ).json({
-                data: staff
+        }else{
+            res.send("Wrong id sent")
+        }
+    })
+
+
+     app.delete("/contactRecords/:id", (req,res)=>{
+        const contactId = parseInt(req.params.id)
+        const index = contactBook.findIndex((item)=>(item.id === contactId))
+        if (!index){
+            res.status(404).json({
+                message: `This id: ${contactId} does not exist`
+    
+            })
+        }else{
+            deletedcontact = contactBook[index]
+            contactBook.splice(index, 1)
+            res.status(200).json({
+                deletedData: deletedcontact
             })
         }
-        })
-
-app.post('/employmentRecords', (req,res) =>{
-    const newStaff = req.body;
-     newStaff.id = employmentSystem.length +1;
-     weeklyTask.push(newStaff);
-     res.status( 200 ).json({
-         data: newStaff
-        });
-    
      })
-
-//
-app.patch('/employmentRecords/:id', function(req,res){
-    const staffId = parseInt(req.params.id);
-    const updatedStaff= req.body;
-    const index = employmentSystem.findIndex((item) => (item.id === staffId))
-    if(index !== -1){
-        employmentSystem[index] ={ ...employmentSystem[index], ...updatedStaff}
-        res.status(200).json({
-            new: employmentSystem[index]
-        })
-    }else{
-        res.send("Wrong id sent")
-    }
-})
-
-
- app.delete("/employmentRecords/:id", (req,res)=>{
-    const staffId = parseInt(req.params.id)
-    const index = employmentSystem.findIndex((item)=>(item.id === staffId))
-    if (!index){
-        res.status(404).json({
-            message: `This id: ${staffId} does not exist`
-
-        })
-    }else{
-        deletedstaff = employmentSystem[index]
-        employmentSystem.splice(index, 1)
-        res.status(200).json({
-            deletedData: deletedstaff
-        })
-    }
- })
-
-
+    
+    
 
 
 app.listen( PORT, () => {
-console.log("Sever is listening to port " + PORT)
+    console.log("Sever is listening to port " + PORT)
 })
-
-
-
