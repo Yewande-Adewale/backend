@@ -12,11 +12,12 @@ const createProfile = async ( req, res ) => {
         motherName,
         children,
         childrenImage: req.files[ "childrenImage" ][ 0 ].filename,
+        children: req.files[ "children" ].map((child)=>child.filename),
     } );
     try {
         const savedProfile = await profile.save();
         if ( savedProfile ) {
-            res.status( 201 ).json( {
+            res.status( 201 ).json({
                 message: "Profile saved successfully",
                 data: savedProfile
             })
@@ -80,19 +81,19 @@ const updateProfile = async (req, res) => {
     const {fatherName,motherName,children} = req.body;
     const updateFields = {
       fatherName: fatherName || profile.fatherName,
-      motherName: motherName|| profile.motherName,
+      motherName: motherName || profile.motherName,
       children: children || profile.children,
       childrenImage: profile.childrenImage,
       };
 
     // check if the profileImage is to be updated
     if (req.files && req.files["childrenImage"]) {
-      const oldChildrenImagePath = `uploads/${profile.childrenImage}`;
+      const oldProfileImagePath = `uploads/${profile.childrenImage}`;
       // Delete the old image if it exists
-      if (fs.existsSync(oldChildrenImagePath)) {
-        fs.unlinkSync(oldChildrenImagePath);
+      if (fs.existsSync(oldProfileImagePath)) {
+        fs.unlinkSync(oldProfileImagePath);
       }
-      updateFields.childrenImage = req.files.childrenImage[0].filename;
+      updateFields.childrenImage = req.files.childrenImage.map((child)=>child.filename)
     }
 
     const updatedProfile = await familyModel.findByIdAndUpdate(
@@ -128,9 +129,9 @@ const deleteProfile = async (req, res) => {
         message: 'Profile not found.',
       });
     }
-    const childrenImagePath = `uploads/${profile.childrenImage}`;
-    if (fs.existsSync(childrenImagePath)) {
-      fs.unlinkSync(childrenImagePath);
+    const profileImagePath = `uploads/${profile.childrenImage}`;
+    if (fs.existsSync(profileImagePath)) {
+      fs.unlinkSync(profileImagePath);
     }
     await familyModel.findByIdAndDelete(profileId);
     res.status(200).json({
